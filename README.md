@@ -10,5 +10,3 @@ This is a test project to verify Git connectivity and basic workflow.
 ## Usage
 This project is for testing purposes only.
 
-## Update
-This Contents Update Now

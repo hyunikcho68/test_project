@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Container Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            margin: 0;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 15px;
+        }
+
+        .metric-value {
+            font-size: 3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .metric-sub {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            transition: width 0.5s ease-out;
+        }
+
+        .cpu-fill { background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); }
+        .mem-fill { background: linear-gradient(90deg, var(--accent-green), var(--accent-blue)); }
+
+        @media (max-width: 600px) {
+            .metric-value { font-size: 2.5em; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Resource Monitor</h1>
+    </header>
+
+    <div class="dashboard">
+        <!-- CPU Card -->
+        <div class="card">
+            <div class="card-header">CPU Usage</div>
+            <div class="metric-value" id="cpu-val">0%</div>
+            <div class="metric-sub">Load Avg (1m): <span id="load-val">0.00</span></div>
+            <div class="progress-bar">
+                <div class="progress-fill cpu-fill" id="cpu-bar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Memory Card -->
+        <div class="card">
+            <div class="card-header">Memory Usage</div>
+            <div class="metric-value" id="mem-val">0%</div>
+            <div class="metric-sub">Used: <span id="mem-used">0</span> MB / Total: <span id="mem-total">0</span> MB</div>
+            <div class="progress-bar">
+                <div class="progress-fill mem-fill" id="mem-bar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Uptime Card -->
+        <div class="card">
+            <div class="card-header">System Uptime</div>
+            <div class="metric-value" id="uptime-val">0h 0m</div>
+            <div class="metric-sub">Since deployment</div>
+        </div>
+    </div>
+
+    <script>
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        function formatUptime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            return `${h}h ${m}m ${s}s`;
+        }
+
+        async function fetchMetrics() {
+            try {
+                const response = await fetch('/api/metrics');
+                const data = await response.json();
+
+                // Update CPU
+                const cpuPercent = data.cpu.usagePercent.toFixed(1);
+                document.getElementById('cpu-val').textContent = `${cpuPercent}%`;
+                document.getElementById('cpu-bar').style.width = `${cpuPercent}%`;
+                document.getElementById('load-val').textContent = data.cpu.loadAvg[0].toFixed(2);
+
+                // Update Memory
+                const memPercent = data.memory.usagePercent.toFixed(1);
+                document.getElementById('mem-val').textContent = `${memPercent}%`;
+                document.getElementById('mem-bar').style.width = `${memPercent}%`;
+                
+                // Convert bytes to MB for simple display or use formatBytes
+                const usedMB = (data.memory.used / 1024 / 1024).toFixed(0);
+                const totalMB = (data.memory.total / 1024 / 1024).toFixed(0);
+                document.getElementById('mem-used').textContent = usedMB;
+                document.getElementById('mem-total').textContent = totalMB;
+
+                // Update Uptime
+                document.getElementById('uptime-val').textContent = formatUptime(data.uptime);
+
+            } catch (error) {
+                console.error('Error fetching metrics:', error);
+            }
+        }
+
+        // Fetch immediately and then every 2 seconds
+        fetchMetrics();
+        setInterval(fetchMetrics, 2000);
+    </script>
+</body>
+</html>

@@ -1,81 +1,81 @@
-# Container Monitoring Dashboard
+# 컨테이너 모니터링 대시보드 (Container Monitoring Dashboard)
 
-A lightweight, real-time dashboard for monitoring container or system resources (CPU, Memory, Uptime). Built with Node.js and designed to be deployed on Kubernetes.
+컨테이너 및 시스템 리소스(CPU, 메모리, 가동 시간)를 모니터링하기 위한 경량 실시간 대시보드입니다. Node.js로 구축되었으며 Kubernetes 배포를 위해 설계되었습니다.
 
-![Preview](https://via.placeholder.com/800x400?text=Dashboard+Preview)
+![미리보기](https://via.placeholder.com/800x400?text=Dashboard+Preview)
 
-## Features
+## 주요 기능
 
-- **Real-time Monitoring**: Visualizes CPU load and Memory usage with live progress bars.
-- **REST API**: Exposes metrics via `/api/metrics` endpoint.
-- **Container Ready**: Includes Dockerfile and Kubernetes manifests for easy deployment.
-- **Modern UI**: Clean, dark-mode interface using native CSS.
+- **실시간 모니터링**: 라이브 프로그레스 바를 통해 CPU 부하 및 메모리 사용량을 시각화합니다.
+- **REST API**: `/api/metrics` 엔드포인트를 통해 메트릭 데이터를 제공합니다.
+- **컨테이너 최적화**: Dockerfile 및 Kubernetes 매니페스트가 포함되어 있어 즉시 배포 가능합니다.
+- **모던 UI**: Native CSS를 사용한 깔끔한 다크 모드 인터페이스를 제공합니다.
 
-## Tech Stack
+## 기술 스택
 
 - **Backend**: Node.js, Express
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
 - **Infrastructure**: Docker, Kubernetes
 
-## Getting Started
+## 시작하기 (Getting Started)
 
-### Prerequisites
+### 사전 요구 사항
 
 - Node.js (v18+)
 - Docker
-- Kubernetes (Minikube, Docker Desktop, or Cloud Provider)
+- Kubernetes (Minikube, Docker Desktop, 또는 Cloud Provider)
 
-### Local Development
+### 로컬 개발 환경 실행
 
-1. **Install dependencies:**
+1. **의존성 설치:**
     ```bash
     npm install
     ```
 
-2. **Start the server:**
+2. **서버 시작:**
     ```bash
     npm start
     ```
-    Access the dashboard at `http://localhost:3000`.
+    브라우저에서 `http://localhost:3000`으로 접속하여 대시보드를 확인합니다.
 
-### Docker Deployment
+### Docker 배포
 
-1. **Build the image:**
+1. **이미지 빌드:**
     ```bash
     docker build -t monitoring-dashboard .
     ```
 
-2. **Run the container:**
+2. **컨테이너 실행:**
     ```bash
     docker run -p 3000:3000 monitoring-dashboard
     ```
 
-### Kubernetes Deployment
+### Kubernetes 배포
 
-1. **Apply manifests:**
+1. **매니페스트 적용:**
     ```bash
     kubectl apply -f k8s/
     ```
 
-2. **Access the service:**
-    - If using LoadBalancer (Docker Desktop/Cloud): Access via `http://localhost` or the external IP.
-    - If using Minikube:
+2. **서비스 접속:**
+    - LoadBalancer 사용 시 (Docker Desktop/Cloud): `http://localhost` 또는 외부 IP로 접속
+    - Minikube 사용 시:
         ```bash
         minikube service monitoring-dashboard
         ```
 
-## Project Structure
+## 프로젝트 구조
 
 ```
-├── public/             # Frontend assets (HTML, CSS, JS)
-├── k8s/                # Kubernetes manifests
+├── public/             # 프론트엔드 리소스 (HTML, CSS, JS)
+├── k8s/                # Kubernetes 매니페스트
 │   ├── deployment.yaml
 │   └── service.yaml
-├── server.js           # Express application & Metrics logic
-├── Dockerfile          # Container definition
+├── server.js           # Express 애플리케이션 및 메트릭 로직
+├── Dockerfile          # 컨테이너 정의 파일
 └── package.json
 ```
 
-## License
+## 라이선스
 
 ISC
